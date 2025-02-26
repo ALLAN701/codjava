@@ -1,0 +1,746 @@
+package ProyectoAutolote_157;
+public class Principal {
+        public static Autolote P[] = new Autolote[20];
+        public static double Tp=0;
+        public static int NR=0; //Número de Registros
+        
+        public static void Inicializa(){
+         for(int k=0;k<=19;k++){
+            P[k] = new Autolote();
+          }//Fin del ciclo k
+        }//Fin del método Inicializa
+        
+    public static void Datos(){
+        P[1].GuardaRegistro("P01", "QUESO",       3, 47.50, false);
+        P[2].GuardaRegistro("P02", "PAPAS",       2, 8.45,  false);
+        P[3].GuardaRegistro("P03", "MARGARINA",   1, 9.30,  true);
+        P[4].GuardaRegistro("P04", "HUEVOS",      2, 45.00, false);
+        P[5].GuardaRegistro("P05", "CHILE (4oz)", 3, 7.20,  true);
+        NR=5;
+    }//Fin del método Datos
+    
+    public static void ImprimeTabla(){
+        System.out.println("Cod  NomProd       Cant  Precio Grab  SubTot  Imp    Total");
+        System.out.println("==========================================================");
+        for(int k=1;k<=NR;k++){
+            P[k].ImprimeRegistro();
+        }//Fin del ciclo k
+        System.out.println("==========================================================");
+        System.out.format("Total a pagar\t\t\t\t\t    " + "%-7.2f",Tp);
+        System.out.println("");
+    }//Fin del método ImprimeTabla
+    
+    public static void Calculos(){
+        for(int k=1;k<=NR;k++){
+            P[k].Calcular();
+            Tp= Tp + P[k].Total;
+        }//Fin del ciclo k
+    }//Fin del método Calculos
+    public static void main2() {
+        Inicializa();
+        Datos();
+        Calculos();
+        ImprimeTabla();
+    }//fin del main
+   
+    public static void main(String[] args) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new FormAutolote().setVisible(true);
+            }
+        });
+    }//fin del main
+}//Fin de la clase Principal
+
+=====================================================================
+package ProyectoAutolote_157;
+
+public class Autolote {
+    //Atributos
+    public String  CodProd;
+    public String  NomProd;
+    public int     Cantidad;
+    public double  Precio;
+    public boolean Grab;
+    public double SubTot;
+    public double Imp;
+    public double Total;
+    
+    //Constructor
+    public Autolote(){
+        CodProd = "cc";
+        NomProd = "nn";
+        Cantidad = 0;
+        Precio = 0.0;
+        Grab = false;
+        SubTot=0.0;
+        Imp = 0.0;
+        Total=0.0;
+    }//Fin del contructor
+    
+  
+    public void ImprimeRegistro(){
+        String f1,f2,f3,f4,f5,f6,f7,f8,f;
+        f1="%-5s";   f2="%-15s"; f3="%-5d"; f4="%-7.2f"; f5="%-7b";
+        f6="%-7.2f"; f7="%-7.2f"; f8="%-7.2f";
+        f = f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + "\n";
+        System.out.format(f,CodProd, NomProd,Cantidad, Precio, Grab,SubTot,Imp,Total);
+    }//Fin del ImprimeRegistro
+    //Escritura
+     public void GuardaRegistro(String cd,String np,int ca,double p,boolean g){
+        CodProd = cd;
+        NomProd = np;
+        Cantidad = ca;
+        Precio = p;
+        Grab = g;
+     }//Fin del método ImprimeRegistro
+     
+     public void Calcular(){
+         SubTot = Precio*Cantidad;
+         if(Grab){
+            Imp = SubTot*0.15;
+         }//Fin del if
+         else{
+             Imp=0;
+         }//Fin del else
+         Total = SubTot + Imp;
+     }//Fin del método Calcular
+}//Fin de la clase Autolote
+
+=============================================================================================================
+package ProyectoAutolote_157;
+import javax.swing.table.DefaultTableModel;
+import java.io.*;
+
+public class FormAutolote extends javax.swing.JFrame {
+    public Autolote Px[]=new Autolote[20];
+    public int i=1, NRx=0;
+    public DefaultTableModel dtm = new DefaultTableModel ();
+    
+    public void Guardar(){
+   File a = new File("C:/TIENDA.Txt");
+        try {
+            FileWriter fw = new FileWriter(a); //Abre el archivo para escritura
+            PrintWriter pw = new PrintWriter(fw); //Variable que escribe en el archivo.
+            for (int k = 1; k <= NRx; k++) {
+                pw.println(Px[k].CodProd);
+                pw.println(Px[k].NomProd);
+                pw.println(Px[k].Cantidad);
+                pw.println(Px[k].Precio);
+                pw.println(Px[k].Grab);
+            } //Fin del ciclo k
+            fw.close();
+        } //Fin del try
+        catch (IOException e) {
+            System.out.println("Error al guardar el archivo.");
+        } //Fin del catch.
+    } //Fin del método Guardar
+   
+   public void Leer() {
+    File a = new File("C:/TIENDA.Txt");
+    try {
+        FileReader fr = new FileReader(a); // Abre el archivo para lectura.
+        BufferedReader br = new BufferedReader(fr); // Variable que lee del archivo.
+        String Linea;
+        Linea = br.readLine();
+        int k = 0;
+        while (Linea != null) {
+            k = k + 1;
+            Px[k].CodProd = Linea;
+            Linea = br.readLine();
+            Px[k].NomProd = Linea;
+            Linea = br.readLine();
+            Px[k].Cantidad = Integer.parseInt(Linea);
+            Linea = br.readLine();
+            Px[k].Precio = Double.parseDouble(Linea);
+            Linea = br.readLine();
+            Px[k].Grab = Boolean.parseBoolean(Linea);
+            Linea = br.readLine();
+        } // Fin del while
+        fr.close();
+        NRx = k;
+    } // Fin del try
+    catch (IOException e) {
+        System.out.println("Error al leer el archivo.");
+    } // Fin del catch
+}// fin del metodo leer
+    
+    public void Modificar(){
+        Px [i].CodProd= Txt_CodProd.getText();
+        Px [i].NomProd= Txt_NomProd.getText();
+        Px [i].Cantidad = Integer.parseInt( Txt_Cantidad.getText());
+        Px [i].Precio = Double.parseDouble( Txt_Precio.getText());
+        Px [i].Grab = Boolean.parseBoolean( Txt_Grab.getText());
+    }// Fin del metodo modificar
+    
+    
+   public void Limpiar(){
+      EliminarReng();  
+   }
+    public void AgregarReng(){
+        for(int k=0; k<=NRx-1;k++){
+       dtm.addRow(new Object []{"","","","","","","","",}); 
+    }//Fin del ciclo k
+    }// fin del metodo agragarReng
+    
+     public void EliminarReng(){
+       int n = dtm.getRowCount();
+         if(n>0){
+           for(int k=0; k<=NRx-1;k++){
+       dtm.removeRow(0); 
+      } //Fin del ciclo k
+    }//Fin del if
+    }// fin del metodo EliminarReng
+     
+    public void Listar(){
+    AgregarReng();
+    for(int k=0;k<=NRx-1; k++){
+        dtm.setValueAt(Px[k+1].CodProd, k,0);
+        dtm.setValueAt(Px[k+1].CodProd, k,1);
+        dtm.setValueAt(Px[k+1].Cantidad,k,2);
+        dtm.setValueAt(Px[k+1].Precio,  k,3);
+        dtm.setValueAt(Px[k+1].Grab,    k,4);
+        dtm.setValueAt(Px[k+1].SubTot,  k,5);
+        dtm.setValueAt(Px[k+1].Imp,     k,6);
+        dtm.setValueAt(Px[k+1].Total,   k,7);
+    }// Fin del ciclo k
+    }// Fin del metodo listar
+    public void Inicializa(){
+         for(int k=0;k<=19;k++){
+            Px[k] = new Autolote();
+          }//Fin del ciclo k
+         Principal.Inicializa();
+    }//Fin del método Inicializa
+    
+      public void Agregar(){
+        Px [NRx + 1].CodProd= Txt_CodProd.getText();
+        Px [NRx + 1].NomProd= Txt_NomProd.getText();
+        Px [NRx + 1].Cantidad = Integer.parseInt( Txt_Cantidad.getText());
+        Px [NRx + 1].Precio = Double.parseDouble( Txt_Precio.getText());
+        Px [NRx + 1].Grab = Boolean.parseBoolean( Txt_Grab.getText());
+        NRx = NRx + 1;
+        Btn_Listar.setEnabled(false);
+    }//Fin del método Agregar
+      
+     public void Nuevo () {
+        Txt_CodProd.setText("");
+        Txt_NomProd.setText("");
+        Txt_Cantidad.setText("");
+        Txt_Precio.setText("");
+        Txt_Grab.setText("");
+        Txt_SubTot.setText("");
+        Txt_Imp.setText("");
+        Txt_Total.setText("");
+        Btn_Listar.setEnabled(true);
+    }//Fin del método Nuevo 
+     
+    public void VerRegistro(){
+        Txt_CodProd.setText(Px[i].CodProd);
+        Txt_NomProd.setText(Px[i].NomProd);
+        Txt_Cantidad.setText(  String.valueOf(Px[i].Cantidad) );
+        Txt_Precio.setText(  String.valueOf(Px[i].Precio) );
+        Txt_Grab.setText(  String.valueOf(Px[i].Grab) );
+        Txt_SubTot.setText(  String.valueOf(Px[i].SubTot) );
+        Txt_Imp.setText(  String.valueOf(Px[i].Imp) );
+        Txt_Total.setText(  String.valueOf(Px[i].Total) );
+    }//Fin del mètodo VerRegistro
+    
+    
+    public FormAutolote() {
+        initComponents();
+        Principal.Inicializa();
+        Principal.Datos();
+        Px = Principal.P;
+        NRx=Principal.NR;
+        VerRegistro();
+        String Titulo[] ={"Codprod","Nomprod","Cantidad","precio","Grab","Subtot","Impuesto","total"};
+        dtm.setColumnIdentifiers(Titulo);
+        jTable1.setModel(dtm);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        Txt_NomProd = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        Txt_Cantidad = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        Txt_Precio = new javax.swing.JTextField();
+        Txt_Grab = new javax.swing.JTextField();
+        Txt_SubTot = new javax.swing.JTextField();
+        Txt_Imp = new javax.swing.JTextField();
+        Txt_Total = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        Txt_CodProd = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        Btn_VerRegistro = new javax.swing.JButton();
+        Btn_Primero = new javax.swing.JButton();
+        Btn_Anterior = new javax.swing.JButton();
+        Btn_Siguiente = new javax.swing.JButton();
+        Btn_Ùltimo = new javax.swing.JButton();
+        Btn_Nuevo = new javax.swing.JButton();
+        Btn_Listar = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        Btn_Agregar1 = new javax.swing.JButton();
+        Btn_Limpiar1 = new javax.swing.JButton();
+        Btn_Modificar = new javax.swing.JButton();
+        Btn_Guardar = new javax.swing.JButton();
+        Btn_Leer = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        Txt_NomProd.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_NomProd.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_NomProd.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        jLabel4.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel4.setText("Precio");
+
+        Txt_Cantidad.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_Cantidad.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_Cantidad.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        jLabel5.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel5.setText("Grab");
+
+        jLabel6.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel6.setText("SubTot");
+
+        jLabel7.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel7.setText("Impuesto");
+
+        jLabel8.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel8.setText("Total");
+
+        Txt_Precio.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_Precio.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_Precio.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        Txt_Grab.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_Grab.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_Grab.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        Txt_SubTot.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_SubTot.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_SubTot.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        Txt_Imp.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_Imp.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_Imp.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        Txt_Total.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_Total.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_Total.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        jLabel1.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel1.setText("CodProd");
+
+        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel2.setText("NomProd");
+
+        Txt_CodProd.setBackground(new java.awt.Color(153, 255, 255));
+        Txt_CodProd.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        Txt_CodProd.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+
+        jLabel3.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel3.setText("Cantidad");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(Txt_CodProd, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_NomProd, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(78, 78, 78)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(Txt_Cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_Precio, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_Grab, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_SubTot, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_Imp, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Txt_Total, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(46, 46, 46)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(61, 61, 61)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(48, 48, 48)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(44, 44, 44)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(45, 45, 45)
+                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(21, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Txt_CodProd, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_NomProd, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_Cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_Precio, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_Grab, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_SubTot, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_Imp, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Txt_Total, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+
+        Btn_VerRegistro.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_VerRegistro.setText("Ver Registro");
+        Btn_VerRegistro.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_VerRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_VerRegistroActionPerformed(evt);
+            }
+        });
+
+        Btn_Primero.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Primero.setText("Primero");
+        Btn_Primero.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Primero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_PrimeroActionPerformed(evt);
+            }
+        });
+
+        Btn_Anterior.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Anterior.setText("Anterior");
+        Btn_Anterior.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Anterior.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_AnteriorActionPerformed(evt);
+            }
+        });
+
+        Btn_Siguiente.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Siguiente.setText("Siguiente");
+        Btn_Siguiente.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Siguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_SiguienteActionPerformed(evt);
+            }
+        });
+
+        Btn_Ùltimo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Ùltimo.setText("Ùltimo");
+        Btn_Ùltimo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Ùltimo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_ÙltimoActionPerformed(evt);
+            }
+        });
+
+        Btn_Nuevo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Nuevo.setText("Nuevo");
+        Btn_Nuevo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Nuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_NuevoActionPerformed(evt);
+            }
+        });
+
+        Btn_Listar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Listar.setText("Listar");
+        Btn_Listar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Listar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_ListarActionPerformed(evt);
+            }
+        });
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        Btn_Agregar1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Agregar1.setText("Agregar");
+        Btn_Agregar1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Agregar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_Agregar1ActionPerformed(evt);
+            }
+        });
+
+        Btn_Limpiar1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Limpiar1.setText("Limpiar");
+        Btn_Limpiar1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Limpiar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_Limpiar1ActionPerformed(evt);
+            }
+        });
+
+        Btn_Modificar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Modificar.setText("Modificar");
+        Btn_Modificar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_ModificarActionPerformed(evt);
+            }
+        });
+
+        Btn_Guardar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Guardar.setText("Guardar");
+        Btn_Guardar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_GuardarActionPerformed(evt);
+            }
+        });
+
+        Btn_Leer.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        Btn_Leer.setText("Leer");
+        Btn_Leer.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        Btn_Leer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_LeerActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(70, 70, 70)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 993, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(55, 55, 55)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Btn_Listar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Limpiar1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Btn_Guardar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Btn_Leer, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Btn_VerRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Btn_Primero, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Anterior, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Siguiente, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Ùltimo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Nuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(Btn_Agregar1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(Btn_Modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(630, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(88, 88, 88)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Btn_VerRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Primero, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Anterior, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Siguiente, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Ùltimo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Nuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Agregar1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Btn_Listar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Limpiar1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Guardar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Btn_Leer, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(89, 89, 89)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(186, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void Btn_VerRegistroActionPerformed(java.awt.event.ActionEvent evt) {                                                
+        VerRegistro();
+
+    }                                               
+
+    private void Btn_PrimeroActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        i = 1;
+        VerRegistro();
+    }                                           
+
+    private void Btn_AnteriorActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        i = i - 1;
+        if(i<1){i=1;}
+        VerRegistro();
+    }                                            
+
+    private void Btn_SiguienteActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        i = i + 1;
+        if(i>=NRx){i=NRx;}
+        VerRegistro();
+    }                                             
+
+    private void Btn_ÙltimoActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        i = NRx;
+        VerRegistro();
+    }                                          
+
+    private void Btn_NuevoActionPerformed(java.awt.event.ActionEvent evt) {                                          
+      Nuevo();
+    }                                         
+
+    private void Btn_ListarActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        Listar();
+    }                                          
+
+    private void Btn_Agregar1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void Btn_Limpiar1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        Limpiar();
+    }                                            
+
+    private void Btn_ModificarActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        Modificar();
+    }                                             
+
+    private void Btn_GuardarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        Guardar();
+    }                                           
+
+    private void Btn_LeerActionPerformed(java.awt.event.ActionEvent evt) {                                         
+       Leer();
+    }                                        
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FormAutolote.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FormAutolote.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FormAutolote.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormAutolote.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new FormAutolote().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton Btn_Agregar1;
+    private javax.swing.JButton Btn_Anterior;
+    private javax.swing.JButton Btn_Guardar;
+    private javax.swing.JButton Btn_Leer;
+    private javax.swing.JButton Btn_Limpiar1;
+    private javax.swing.JButton Btn_Listar;
+    private javax.swing.JButton Btn_Modificar;
+    private javax.swing.JButton Btn_Nuevo;
+    private javax.swing.JButton Btn_Primero;
+    private javax.swing.JButton Btn_Siguiente;
+    private javax.swing.JButton Btn_VerRegistro;
+    private javax.swing.JButton Btn_Ùltimo;
+    private javax.swing.JTextField Txt_Cantidad;
+    private javax.swing.JTextField Txt_CodProd;
+    private javax.swing.JTextField Txt_Grab;
+    private javax.swing.JTextField Txt_Imp;
+    private javax.swing.JTextField Txt_NomProd;
+    private javax.swing.JTextField Txt_Precio;
+    private javax.swing.JTextField Txt_SubTot;
+    private javax.swing.JTextField Txt_Total;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    // End of variables declaration                   
+}
+
